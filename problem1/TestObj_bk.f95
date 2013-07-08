@@ -38,7 +38,7 @@
 		iflag=0
 		do k=1,N
 			if (X(k)<0.0.or.X(k)>1.0) then
-				write(*,*)'infeasible ',X
+!				write(*,*)'infeasible ',X
 				OBJ=1.0e13
 				iflag=1
 				exit
@@ -49,6 +49,12 @@
 			open(150, FILE="beta.dat", STATUS='OLD')
 			read(150,*)beta
 			close(150)
+		!	do i=1,1,1
+		!		do j=1,1,1
+			!	beta(1)=0.5
+			!	beta(2)=1
+			!	beta(3)=1-(beta(1)+beta(2))
+			!	write(*,*)'beta ',beta
 				r=MATMUL(Ip,beta)
 			!	write(*,*)'beta and r ',beta,' ',r
 				do ii=3,N,1
@@ -71,6 +77,9 @@
 				else
 					OBJ =	dist**2	
 				end if
+	!		end do
+	!	end do
+
 
 		OPEN(85, FILE="RSMInTest.dat", STATUS='OLD', POSITION='APPEND')
 		WRITE(85,*)X,f1,f2,f3, OBJ
