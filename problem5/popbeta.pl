@@ -1,0 +1,18 @@
+#!/usr/local/bin/perl
+use Tie::File;
+use File::Copy;
+
+$m=6;
+tie @array, 'Tie::File', 'betas.txt' or die;
+$temp = shift(@array);
+@b = split(" ",$temp);
+
+open OUT, ">", "beta.dat" or die;
+for $i(0..$m-1){
+	print OUT $b[$i]," ";
+}
+close OUT;
+
+untie @array;
+
+

@@ -1,0 +1,95 @@
+		MODULE TestObjInit_MOD
+		USE REAL_PRECISION
+		CONTAINS
+
+		SUBROUTINE TestObjInit(X, OBJ)
+		IMPLICIT NONE
+		REAL(KIND = R8), DIMENSION(12), INTENT(IN):: X
+		REAL(KIND = R8), DIMENSION(1), INTENT(OUT):: OBJ
+
+		!local variables
+		INTEGER::i, j, k, ii, N, iflag, iflg, cnt, ierr
+		REAL(KIND = R8):: f1
+		REAL(KIND = R8):: f2
+		REAL(KIND = R8):: f3
+		REAL(KIND = R8):: g
+		REAL(KIND = R8)::SumXi, pi
+		REAL(KIND = R8), DIMENSION(12):: lb, ub, XX
+		REAL(KIND = R8):: f1_t, f2_t, f3_t, tol
+
+		N = 12
+		pi = 3.14159265359
+		SumXi = 0.0
+
+      lb(1:12) = 0.0
+		ub(1:12) = 1.0
+
+		f1=0
+		f2=0
+		f3=0
+		iflag=0
+		iflg=0
+		cnt=0
+
+		do k=1,N
+			if (X(k)<0.0.or.X(k)>1.0) then
+!				write(*,*)'infeasible ',X
+				OBJ=1.0e13
+				iflag=1
+				exit
+			end if
+		end do
+		
+		if(iflag<1) then
+		OPEN(75, FILE="RSMInTest.dat", STATUS='OLD')
+		DO
+			READ(75,*,IOSTAT=ierr)XX,f1_t,f2_t,f3_t
+			IF(ierr > 0) THEN
+				WRITE(*,*) 'Read failed'
+				EXIT
+			ELSE IF (ierr < 0) THEN
+				do i=3,N,1
+					SumXi = SumXi + ((X(i)-0.5)**2 - Cos(20*pi*(X(i)-0.5)))
+				end do
+				!write(*,*) 'Sum ',SumXi
+				g   = 100 * (10.0 + SumXi);
+				!write(*,*) 'g ',g
+				f1 = 0.5*X(1)*X(2)*(1+g)
+			  	f2  = 0.5*X(1)*(1-X(2))*(1+g)
+			  	f3  = 0.5*(1-X(1))*(1+g)
+			!	WRITE(*,*) 'Evaluate ', X, f1, f2, f3
+
+				EXIT
+			ELSE 
+				do i = 1, N, 1
+					IF( (abs(X(i)-XX(i))<=tol) ) THEN
+						cnt = cnt + 1
+					END IF
+				end do
+				if(cnt.eq.N) then
+					f1 = f1_t
+					f2 = f2_t
+					f3 = f3_t
+					iflg = 1
+					WRITE(*,*) 'off the shelf ', X, f1, f2					
+					EXIT
+				end if
+			END IF
+			cnt = 0
+		END DO
+		CLOSE(75)
+
+		OBJ=f1+f2+f3
+
+		IF(iflg < 1) THEN
+			OPEN(85, FILE="RSMInTest.dat", STATUS='OLD', POSITION='APPEND')
+			WRITE(85,*)X,f1,f2,f3
+			CLOSE(85)
+		END IF
+
+		end if
+
+		END SUBROUTINE TestObjInit
+
+		END MODULE TestObjInit_MOD
+

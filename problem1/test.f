@@ -13,7 +13,7 @@
 			ub(i)=1
 		end do
 
-      call nomad( 12 , 1 , x , lb , ub , 1000 , 1 )
+      call nomad( 12 , 1 , x , lb , ub , 500 , 2 )
 
 		open(102, FILE="X0.dat",STATUS='REPLACE')
 		write(102,*)x
@@ -27,12 +27,13 @@
 
       subroutine bb(xx,fx)
 				use TestObj_MOD
+!				use TestObjInit_MOD
 				use REAL_PRECISION
 				implicit none
 
 				real(kind = R8), dimension(12), intent(IN) :: xx
 				real(kind = R8), dimension(1), intent(OUT):: fx
-	
 				call TestObj(xx, fx)
+!				call TestObjInit(xx, fx)
 	      	return
 		end
